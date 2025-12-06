@@ -101,12 +101,12 @@ function ModelCoin({ scrollProgress }: ModelCoinProps) {
     // Calculate target values based on scroll progress
     // Section 0 (Hero): Coin on the right, rotating
     // Section 1 (Services): Coin moves to center-left, tilts
-    // Section 2 (Contact): Coin moves down and shrinks
+    // Section 2 (Contact): Coin moves down and shrink
 
     const section = Math.floor(scrollProgress * 3);
     const sectionProgress = (scrollProgress * 3) % 1;
 
-    if (section === 0 || (section === 0 && sectionProgress === 0)) {
+    if (section === 0) {
       // Hero section
       targetPositionX.current = viewport.width / 4;
       targetPositionY.current = 0;
@@ -127,22 +127,25 @@ function ModelCoin({ scrollProgress }: ModelCoinProps) {
     const rotationSpeed = 0.5 + (1 - scrollProgress) * 0.5;
     targetRotationY.current += delta * rotationSpeed;
 
-    // Smooth interpolation (lerp)
+    // Smooth interpolation (lerp) for position and scale
     const lerpFactor = 3 * delta;
-    meshRef.current.rotation.y += (targetRotationY.current - meshRef.current.rotation.y) * lerpFactor;
+    
+    // Direct rotation assignment for continuous smooth rotation
+    meshRef.current.rotation.y = targetRotationY.current;
     meshRef.current.rotation.x = Math.sin(targetRotationY.current * 0.5) * 0.2;
+    
+    // Lerp position for smooth transitions
     meshRef.current.position.x += (targetPositionX.current - meshRef.current.position.x) * lerpFactor;
     meshRef.current.position.y += (targetPositionY.current - meshRef.current.position.y) * lerpFactor;
     
+    // Lerp scale for smooth transitions
     const currentScale = meshRef.current.scale.x;
     const newScale = currentScale + (targetScale.current - currentScale) * lerpFactor;
     meshRef.current.scale.set(newScale, newScale, newScale);
   });
 
-  const positionX = viewport.width / 4;
-
   return (
-    <group ref={meshRef} position={[positionX, 0, 0]} scale={2.5}>
+    <group ref={meshRef} position={[viewport.width / 4, 0, 0]} scale={2.5}>
       <pointLight position={[2, 2, 2]} intensity={3} color="#ffffff" />
       <pointLight position={[-2, -2, -2]} intensity={1} color={THEME.accent} />
 
